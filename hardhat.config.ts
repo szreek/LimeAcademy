@@ -10,14 +10,19 @@ task("deploy-testnets", "Deploys contract on a provided network")
      .setAction(async () => {
         const deployLibrary = require("./scripts/deploy");
         await deployLibrary()
-      });
+});
 
 task("deploy-mainnet", "Deploys contract on a provided network")
     .addParam("privateKey", "Please provide the private key")
     .setAction(async ({privateKey}) => {
          const deployLibrary = require("./scripts/deploy-with-param");
           await deployLibrary(privateKey);
-      });
+});
+
+subtask("print", "Prints a message")
+    .addParam("message", "The message to print")
+    .setAction(async (taskArgs) => {console.log(taskArgs.message);
+});      
 
 module.exports = {
   solidity: {
