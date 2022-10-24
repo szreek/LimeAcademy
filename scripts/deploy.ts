@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import hre from 'hardhat';
 
-async function deployLibrary() {
+async function deployLibrary(_libraryName: any) {
   await hre.run('compile');
   const [deployer] = await ethers.getSigners();
 
@@ -9,8 +9,10 @@ async function deployLibrary() {
   console.log('Account balance:', (await deployer.getBalance()).toString()); // We are printing the account balance
 
   const Library = await ethers.getContractFactory("Library");
-  const library = await Library.deploy();
+  const library = await Library.deploy(_libraryName);
   await library.deployed();
+
+  console.log("Library name:", _libraryName);
   console.log("Library deployed to:", library.address);
   await hre.run('print', { message: "Done!" })
 }

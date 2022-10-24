@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Library is Ownable {
 
+    string public libraryName;
     Book[] public books;
     address[] public borrowers;
 
@@ -15,6 +16,10 @@ contract Library is Ownable {
         uint id;
         uint copiesCount;
         string tittle;
+    }
+
+    constructor(string memory _libraryName) {
+        libraryName = _libraryName;
     }
 
     modifier onlyIfBookAvailable(uint _bookId) {
@@ -52,5 +57,5 @@ contract Library is Ownable {
 
     function returnBook(uint _bookId) external OnlyIfReturnable(_bookId) {
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] + 1;
-    } 
+    }
 }

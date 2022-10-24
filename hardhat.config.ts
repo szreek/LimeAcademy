@@ -6,17 +6,19 @@ const config: HardhatUserConfig = {
   solidity: "0.8.17",
 };
 
-task("deploy-testnets", "Deploys contract on a provided network")
-     .setAction(async () => {
-        const deployLibrary = require("./scripts/deploy");
-        await deployLibrary()
+task("deploy", "Deploys contract on a provided network")
+    .addParam("libraryName", "Please provide the Library Name")
+    .setAction(async ({libraryName}) => {
+         const deployLibrary = require("./scripts/deploy");
+          await deployLibrary(libraryName);
 });
 
 task("deploy-mainnet", "Deploys contract on a provided network")
+    .addParam("libraryName", "Please provide the Library Name")
     .addParam("privateKey", "Please provide the private key")
-    .setAction(async ({privateKey}) => {
-         const deployLibrary = require("./scripts/deploy-with-param");
-          await deployLibrary(privateKey);
+    .setAction(async ({libraryName, privateKey}) => {
+         const deployLibrary = require("./scripts/deploy-mainnet");
+          await deployLibrary(libraryName, privateKey);
 });
 
 subtask("print", "Prints a message")
