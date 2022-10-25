@@ -1,6 +1,7 @@
 import { HardhatUserConfig, subtask, task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-etherscan";
+import "@nomiclabs/hardhat-etherscan";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
@@ -64,12 +65,7 @@ module.exports = {
         runs: 200
       }
     }
-  },
-
-  mocha: {
-    timeout: 80000
   }
-
 }
 
 export default config;

@@ -32,18 +32,20 @@ contract Library is Ownable {
         _;
     }
 
-    function addBook(string memory _tittle, uint _copiesCount) public onlyOwner {
+    function addBook(string memory _tittle, uint _copiesCount) public onlyOwner returns(uint _id){
         uint id = _generateID(_tittle);
         books.push(Book(id, _copiesCount, _tittle));
         uint index = books.length - 1;
         Book storage a = books[index];
         idToBook[id] = a; 
-        idToNumberLeft[id] = a.copiesCount; 
+        idToNumberLeft[id] = a.copiesCount;
+        return id; 
     }
 
     function _generateID(string memory _tittle) private pure returns (uint) {
-        uint id = uint(keccak256(abi.encodePacked(_tittle)));
-        return id;
+        uint mask = 10 ** 8;
+        uint256 id = uint(keccak256(abi.encodePacked(_tittle)));
+        return id % mask;
     }
 
     function getListOfBooks() external view returns(Book[] memory) {

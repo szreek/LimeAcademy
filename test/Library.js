@@ -27,6 +27,18 @@ describe('Library', () => {
       expect(await library.getListOfBooks()).to.have.all.members([])
     })
 
+    it('adds book position with the usage of "addBook()" function', async () => {
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10");
+      let idExpected = ethers.BigNumber.from("76275329");
+      await library.addBook(bookTitle, nrCopies)
+      const insertedBook = [idExpected, nrCopies, bookTitle]
+
+      let books = await library.getListOfBooks()
+      console.log("a", books)
+      expect(await library.idToBook(idExpected)).to.have.deep.members(insertedBook)
+    })
+
   })
 
 })
