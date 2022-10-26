@@ -32,32 +32,32 @@ contract Library is Ownable {
         _;
     }
 
-    function addBook(string memory _tittle, uint _copiesCount) public onlyOwner returns(uint _id){
-        uint id = _generateID(_tittle);
-        books.push(Book(id, _copiesCount, _tittle));
-        uint index = books.length - 1;
-        Book storage a = books[index];
-        idToBook[id] = a; 
-        idToNumberLeft[id] = a.copiesCount;
-        return id; 
-    }
+    // function addBook(string memory _tittle, uint _copiesCount) public onlyOwner returns(uint _id){
+    //     uint id = _generateID(_tittle);
+    //     books.push(Book(id, _copiesCount, _tittle));
+    //     uint index = books.length - 1;
+    //     Book storage a = books[index];
+    //     idToBook[id] = a; 
+    //     idToNumberLeft[id] = a.copiesCount;
+    //     return id; 
+    // }
 
-    function _generateID(string memory _tittle) private pure returns (uint) {
-        uint mask = 10 ** 8;
-        uint256 id = uint(keccak256(abi.encodePacked(_tittle)));
-        return id % mask;
-    }
+    // function _generateID(string memory _tittle) private pure returns (uint) {
+    //     uint mask = 10 ** 8;
+    //     uint id = uint(keccak256(abi.encodePacked(_tittle)));
+    //     return id % mask;
+    // }
 
-    function getListOfBooks() external view returns(Book[] memory) {
-        return books;
-    }
+    // // function getListOfBooks() external view returns(Book[] memory) {
+    // //     return books;
+    // // }
 
-    function borrowBook(uint _bookId) external onlyIfBookAvailable(_bookId) {
-        idToNumberLeft[_bookId] = idToNumberLeft[_bookId] - 1;
-        borrowers.push(msg.sender);
-    }
+    // function borrowBook(uint _bookId) external onlyIfBookAvailable(_bookId) {
+    //     idToNumberLeft[_bookId] = idToNumberLeft[_bookId] - 1;
+    //     borrowers.push(msg.sender);
+    // }
 
-    function returnBook(uint _bookId) external OnlyIfReturnable(_bookId) {
-        idToNumberLeft[_bookId] = idToNumberLeft[_bookId] + 1;
-    }
+    // function returnBook(uint _bookId) external OnlyIfReturnable(_bookId) {
+    //     idToNumberLeft[_bookId] = idToNumberLeft[_bookId] + 1;
+    // }
 }
