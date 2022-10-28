@@ -52,7 +52,8 @@ contract Library is Ownable {
     }
 
     function getListOfBooks() external view returns(Book[] memory) {
-        return books;
+        Book[] memory localBooks = new Book[](books.length);
+        return localBooks;
     }
 
     function borrowBook(string memory _tittle) external onlyIfBookAvailable(_tittle) {
