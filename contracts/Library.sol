@@ -35,7 +35,8 @@ contract Library is Ownable {
         _;
     }
 
-    modifier OnlyIfReturnable(uint _bookId) {
+    modifier OnlyIfReturnable(string memory _tittle) {
+        uint _bookId = _generateID(_tittle);
         require(idToNumberLeft[_bookId] < idToBook[_bookId].copiesCount, "All copies already returned");
         _;
     }
@@ -60,7 +61,8 @@ contract Library is Ownable {
         borrowerToBookId[msg.sender] = _bookId;
     }
 
-    function returnBook(uint _bookId) external OnlyIfReturnable(_bookId) {
+    function returnBook(string memory _tittle) external OnlyIfReturnable(_tittle) {
+        uint _bookId = _generateID(_tittle);
         delete borrowerToBookId[msg.sender];
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] + 1;
     }

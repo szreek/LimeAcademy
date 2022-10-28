@@ -72,6 +72,38 @@ describe('Library', () => {
       await library.connect(otherAccount).borrowBook(bookTitle)
       expect(await library.connect(otherAccount).borrowerToBookId(otherAccount.address)).to.equal(idExpected)
     })
+
+    it('should number of copies decrease when book has been borrowed', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      let idExpected = ethers.BigNumber.from("76275329");
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(otherAccount).borrowBook(bookTitle)
+      expect(await library.connect(otherAccount).idToNumberLeft(idExpected)).to.equal(nrCopies - 1)
+    })
+
+    it('should be able to return borrowed book "returnBook()"', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      let idExpected = ethers.BigNumber.from("76275329");
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(otherAccount).borrowBook(bookTitle)
+      await library.connect(otherAccount).returnBook(bookTitle)
+      expect(await library.connect(otherAccount).borrowerToBookId(otherAccount.address)).to.equal(0)
+    })
+
+    it('should number of copies increase when book has been returned', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      let idExpected = ethers.BigNumber.from("76275329");
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(otherAccount).borrowBook(bookTitle)
+      await library.connect(otherAccount).returnBook(bookTitle)
+      expect(await library.connect(otherAccount).idToNumberLeft(idExpected)).to.equal(nrCopies)
+    })
   })
 
 })
