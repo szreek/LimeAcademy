@@ -28,12 +28,18 @@ contract Library is Ownable {
         _;
     }
 
+    modifier onlyIfNotAddedALready(string memory _tittle) {
+            uint id = _generateID(_tittle);
+            require(keccak256( abi.encode(idToBook[id].tittle)) != keccak256(abi.encode(_tittle)), "Book already added to Library"); 
+        _;
+    }
+
     modifier OnlyIfReturnable(uint _bookId) {
         require(idToNumberLeft[_bookId] < idToBook[_bookId].copiesCount, "All copies already returned");
         _;
     }
 
-    function addBook(string memory _tittle, uint _copiesCount) public onlyOwner returns(uint _id){
+    function addBook(string memory _tittle, uint _copiesCount) public onlyOwner onlyIfNotAddedALready(_tittle) returns(uint _id){
         uint id = _generateID(_tittle);
         books.push(Book(id, _copiesCount, _tittle));
         uint index = books.length - 1;
@@ -49,9 +55,9 @@ contract Library is Ownable {
         return id % mask;
     }
 
-    // function getListOfBooks() external view returns(Book[] memory) {
-    //     return books;
-    // }
+    function getListOfBooks() external view returns(Book[] memory) {
+        return books;
+    }
 
     function borrowBook(uint _bookId) external onlyIfBookAvailable(_bookId) {
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] - 1;

@@ -7,10 +7,11 @@ describe('Library', () => {
   const libraryName = 'Poznan City Library'
 
   async function deployLibraryFixture() {
+        const [deployer, otherAccount] = await ethers.getSigners();
         const Library = await ethers.getContractFactory('Library')
         library = await Library.deploy('Poznan City Library')
         await library.deployed();
-        return { Library, library};
+        return { library, deployer, otherAccount};
   }
 
   describe('Deployment', async () => {
@@ -30,7 +31,6 @@ describe('Library', () => {
 
     it('adds book position with the usage of "addBook()" function', async () => {
       const { library } = await loadFixture(deployLibraryFixture);
-
       let bookTitle = 'Green Mile'
       let nrCopies = ethers.BigNumber.from("10");
       let idExpected = ethers.BigNumber.from("76275329");
@@ -38,10 +38,23 @@ describe('Library', () => {
       const insertedBook = [idExpected, nrCopies, bookTitle]
 
       let books = await library.getListOfBooks()
-      console.log("a", books)
       expect(await library.idToBook(idExpected)).to.have.deep.members(insertedBook)
     })
 
+    it('should fail on attempt of adding book no by Other account with "addBook()" method ', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10");
+      await expect(library.connect(otherAccount).addBook(bookTitle, nrCopies)).to.be.revertedWith("Ownable: caller is not the owner");
+    })
+
+    it('should fail on attempt of adding book thats in library already with "addBook()" method  ', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      library.connect(deployer).addBook(bookTitle, nrCopies)
+      await expect(library.connect(deployer).addBook(bookTitle, nrCopies)).to.be.revertedWith("Book already added to Library");
+    })
   })
 
 })
