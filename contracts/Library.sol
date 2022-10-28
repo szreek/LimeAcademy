@@ -23,14 +23,15 @@ contract Library is Ownable {
         libraryName = _libraryName;
     }
 
-    modifier onlyIfBookAvailable(uint _bookId) {
-        require(idToNumberLeft[_bookId] > 0, "No more copies left to be borrowed");
+    modifier onlyIfBookAvailable(string memory _tittle) {
+        uint _bookId = _generateID(_tittle);
+        require(idToNumberLeft[_bookId] > 0, "This Book is not available at the moment");
         _;
     }
 
     modifier onlyIfNotAddedALready(string memory _tittle) {
-            uint id = _generateID(_tittle);
-            require(keccak256( abi.encode(idToBook[id].tittle)) != keccak256(abi.encode(_tittle)), "Book already added to Library"); 
+        uint _bookId = _generateID(_tittle);
+        require(keccak256( abi.encode(idToBook[_bookId].tittle)) != keccak256(abi.encode(_tittle)), "Book already added to Library"); 
         _;
     }
 
@@ -40,31 +41,33 @@ contract Library is Ownable {
     }
 
     function addBook(string memory _tittle, uint _copiesCount) public onlyOwner onlyIfNotAddedALready(_tittle) returns(uint _id){
-        uint id = _generateID(_tittle);
-        books.push(Book(id, _copiesCount, _tittle));
+        uint _bookId = _generateID(_tittle);
+        books.push(Book(_bookId, _copiesCount, _tittle));
         uint index = books.length - 1;
         Book storage a = books[index];
-        idToBook[id] = a; 
-        idToNumberLeft[id] = a.copiesCount;
-        return id; 
-    }
-
-    function _generateID(string memory _tittle) private pure returns (uint) {
-        uint mask = 10 ** 8;
-        uint id = uint(keccak256(abi.encodePacked(_tittle)));
-        return id % mask;
+        idToBook[_bookId] = a; 
+        idToNumberLeft[_bookId] = a.copiesCount;
+        return _bookId; 
     }
 
     function getListOfBooks() external view returns(Book[] memory) {
         return books;
     }
 
-    function borrowBook(uint _bookId) external onlyIfBookAvailable(_bookId) {
+    function borrowBook(string memory _tittle) external onlyIfBookAvailable(_tittle) {
+        uint _bookId = _generateID(_tittle);
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] - 1;
         borrowers.push(msg.sender);
     }
 
     function returnBook(uint _bookId) external OnlyIfReturnable(_bookId) {
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] + 1;
+    }
+
+    //############/PRIVATE_HELPER_FUNCTIONS#####################################
+    function _generateID(string memory _tittle) private pure returns (uint) {
+        uint mask = 10 ** 8;
+        uint id = uint(keccak256(abi.encodePacked(_tittle)));
+        return id % mask;
     }
 }

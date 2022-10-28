@@ -55,6 +55,13 @@ describe('Library', () => {
       library.connect(deployer).addBook(bookTitle, nrCopies)
       await expect(library.connect(deployer).addBook(bookTitle, nrCopies)).to.be.revertedWith("Book already added to Library");
     })
+
+    it('should fail on attempt of borrowing book "borrowBook()"  thats in library that is not added', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      await expect(library.connect(deployer).borrowBook(bookTitle)).to.be.revertedWith("This Book is not available at the moment");
+    })
   })
 
 })
