@@ -3,7 +3,8 @@ pragma solidity ^0.8.0;
 pragma abicoder v2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// currently deployed to 0x243d54B9BE0c63d374fE3c9CB68be7312A7E3F56
+// currently deployed to 0x82E0f4BF61f139A9BaDCe64D0AcFbA32cB0B5E63
+// https://goerli.etherscan.io/address/0x82E0f4BF61f139A9BaDCe64D0AcFbA32cB0B5E63#code
 contract Library is Ownable {
 
     string public libraryName;
