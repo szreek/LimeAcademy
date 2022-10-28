@@ -8,8 +8,8 @@ contract Library is Ownable {
 
     string public libraryName;
     Book[] public books;
-    address[] public borrowers;
 
+    mapping (address => uint) public borrowerToBookId;
     mapping (uint => Book) public idToBook;
     mapping (uint => uint) public idToNumberLeft;
 
@@ -44,9 +44,9 @@ contract Library is Ownable {
         uint _bookId = _generateID(_tittle);
         books.push(Book(_bookId, _copiesCount, _tittle));
         uint index = books.length - 1;
-        Book storage a = books[index];
-        idToBook[_bookId] = a; 
-        idToNumberLeft[_bookId] = a.copiesCount;
+        Book storage added = books[index];
+        idToBook[_bookId] = added; 
+        idToNumberLeft[_bookId] = added.copiesCount;
         return _bookId; 
     }
 
@@ -57,10 +57,11 @@ contract Library is Ownable {
     function borrowBook(string memory _tittle) external onlyIfBookAvailable(_tittle) {
         uint _bookId = _generateID(_tittle);
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] - 1;
-        borrowers.push(msg.sender);
+        borrowerToBookId[msg.sender] = _bookId;
     }
 
     function returnBook(uint _bookId) external OnlyIfReturnable(_bookId) {
+        delete borrowerToBookId[msg.sender];
         idToNumberLeft[_bookId] = idToNumberLeft[_bookId] + 1;
     }
 

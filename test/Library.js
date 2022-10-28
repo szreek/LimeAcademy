@@ -62,6 +62,16 @@ describe('Library', () => {
       let nrCopies = ethers.BigNumber.from("10")
       await expect(library.connect(deployer).borrowBook(bookTitle)).to.be.revertedWith("This Book is not available at the moment");
     })
+
+    it('should be able to borrow book "borrowBook()" that is in the library', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      let idExpected = ethers.BigNumber.from("76275329");
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(otherAccount).borrowBook(bookTitle)
+      expect(await library.connect(otherAccount).borrowerToBookId(otherAccount.address)).to.equal(idExpected)
+    })
   })
 
 })
