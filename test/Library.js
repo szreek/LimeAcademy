@@ -33,11 +33,10 @@ describe('Library', () => {
       const { library } = await loadFixture(deployLibraryFixture);
       let bookTitle = 'Green Mile'
       let nrCopies = ethers.BigNumber.from("10");
-      let idExpected = ethers.BigNumber.from("76275329");
-      await library.addBook(bookTitle, nrCopies)
+      let idExpected = await library.callStatic.addBook(bookTitle, nrCopies); // in order to obtain id from a function that is not view nor pure hack like this. 
+      await library.addBook(bookTitle, nrCopies) // above static call does not change state of the contract that is why we need also the non static invocation of addBook method
       const insertedBook = [idExpected, nrCopies, bookTitle]
 
-      let books = await library.getListOfBooks()
       expect(await library.idToBook(idExpected)).to.have.deep.members(insertedBook)
     })
 
