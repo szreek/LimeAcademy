@@ -45,9 +45,9 @@ module.exports = {
 };
 
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "localhost",
   networks: {
-    hardhat: {
+    localhost: {
     },
     goerli: {
       url: GOERLI_URL,
