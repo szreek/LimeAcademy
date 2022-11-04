@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 pragma abicoder v2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// currently deployed to 0x82E0f4BF61f139A9BaDCe64D0AcFbA32cB0B5E63
+// currently deployed to 0x7b5c69876Acf21250737A15b9f65B9A6862984B7
 // https://goerli.etherscan.io/address/0x82E0f4BF61f139A9BaDCe64D0AcFbA32cB0B5E63#code
 contract Library is Ownable {
 
@@ -26,6 +26,7 @@ contract Library is Ownable {
 
     modifier onlyIfBookAvailable(string memory _tittle) {
         uint _bookId = _generateID(_tittle);
+        require(borrowerToBookId[msg.sender] == 0, "The user has already borrowed a book, only 1 book can be borrowed at a time by the given user");
         require(idToNumberLeft[_bookId] > 0, "This Book is not available at the moment");
         _;
     }
@@ -38,6 +39,7 @@ contract Library is Ownable {
 
     modifier OnlyIfReturnable(string memory _tittle) {
         uint _bookId = _generateID(_tittle);
+        require(borrowerToBookId[msg.sender] == _bookId, "This book is currently not borrowed by this user");
         require(idToNumberLeft[_bookId] < idToBook[_bookId].copiesCount, "All copies already returned");
         _;
     }

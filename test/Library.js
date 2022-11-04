@@ -58,7 +58,6 @@ describe('Library', () => {
     it('should fail on attempt of borrowing book "borrowBook()"  thats in library that is not added', async () => {
       const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
       let bookTitle = 'Green Mile'
-      let nrCopies = ethers.BigNumber.from("10")
       await expect(library.connect(deployer).borrowBook(bookTitle)).to.be.revertedWith("This Book is not available at the moment");
     })
 
@@ -66,7 +65,7 @@ describe('Library', () => {
       const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
       let bookTitle = 'Green Mile'
       let nrCopies = ethers.BigNumber.from("10")
-      let idExpected = ethers.BigNumber.from("76275329");
+      let idExpected = await library.callStatic.addBook(bookTitle, nrCopies); // in order to obtain id from a function that is not view nor pure hack like this. 
       await library.connect(deployer).addBook(bookTitle, nrCopies)
       await library.connect(otherAccount).borrowBook(bookTitle)
       expect(await library.connect(otherAccount).borrowerToBookId(otherAccount.address)).to.equal(idExpected)
@@ -76,7 +75,7 @@ describe('Library', () => {
       const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
       let bookTitle = 'Green Mile'
       let nrCopies = ethers.BigNumber.from("10")
-      let idExpected = ethers.BigNumber.from("76275329");
+      let idExpected = await library.callStatic.addBook(bookTitle, nrCopies); // in order to obtain id from a function that is not view nor pure hack like this. 
       await library.connect(deployer).addBook(bookTitle, nrCopies)
       await library.connect(otherAccount).borrowBook(bookTitle)
       expect(await library.connect(otherAccount).idToNumberLeft(idExpected)).to.equal(nrCopies - 1)
@@ -86,7 +85,6 @@ describe('Library', () => {
       const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
       let bookTitle = 'Green Mile'
       let nrCopies = ethers.BigNumber.from("10")
-      let idExpected = ethers.BigNumber.from("76275329");
       await library.connect(deployer).addBook(bookTitle, nrCopies)
       await library.connect(otherAccount).borrowBook(bookTitle)
       await library.connect(otherAccount).returnBook(bookTitle)
@@ -97,12 +95,57 @@ describe('Library', () => {
       const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
       let bookTitle = 'Green Mile'
       let nrCopies = ethers.BigNumber.from("10")
-      let idExpected = ethers.BigNumber.from("76275329");
+      let idExpected = await library.callStatic.addBook(bookTitle, nrCopies); // in order to obtain id from a function that is not view nor pure hack like this. 
       await library.connect(deployer).addBook(bookTitle, nrCopies)
       await library.connect(otherAccount).borrowBook(bookTitle)
       await library.connect(otherAccount).returnBook(bookTitle)
       expect(await library.connect(otherAccount).idToNumberLeft(idExpected)).to.equal(nrCopies)
     })
+
+    it('user should not borrow the same book twice', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(deployer).borrowBook(bookTitle)
+      await expect(library.connect(deployer).borrowBook(bookTitle)).to.be.revertedWith("The user has already borrowed a book, only 1 book can be borrowed at a time by the given user");
+    })
+
+    it('user should not borrow different book because only one per user can be borrowed at a time', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      let bookTitle2 = 'Little Prince'
+      let nrCopies2 = ethers.BigNumber.from("10")
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(deployer).addBook(bookTitle2, nrCopies2)
+      await library.connect(deployer).borrowBook(bookTitle)
+      await expect(library.connect(deployer).borrowBook(bookTitle2)).to.be.revertedWith("The user has already borrowed a book, only 1 book can be borrowed at a time by the given user");
+    })
+
+    it('user should not return the same book twice', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      await library.connect(deployer).borrowBook(bookTitle)
+      await library.connect(deployer).returnBook(bookTitle)
+      await expect(library.connect(deployer).returnBook(bookTitle)).to.be.revertedWith("This book is currently not borrowed by this user");
+    })
+
+    it('user should not return if borrowed other book', async () => {
+      const { library, deployer, otherAccount } = await loadFixture(deployLibraryFixture);
+      let bookTitle = 'Green Mile'
+      let nrCopies = ethers.BigNumber.from("10")
+      await library.connect(deployer).addBook(bookTitle, nrCopies)
+      let bookTitle2 = 'Little Prince'
+      let nrCopies2 = ethers.BigNumber.from("10")
+      await library.connect(deployer).addBook(bookTitle2, nrCopies2)
+
+      await library.connect(deployer).borrowBook(bookTitle)
+      await expect(library.connect(deployer).returnBook(bookTitle2)).to.be.revertedWith("This book is currently not borrowed by this user");
+    })
+
   })
 
 })
