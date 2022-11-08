@@ -30,7 +30,7 @@ const run = async function() {
     }
 
     let transactionBorrowing = await libraryContract.borrowBook(bookTitle)
-    transactionBorrowing.wait();
+    await transactionBorrowing.wait();
 
     let BookId = await libraryContract.borrowerToBookId(PUBLIC_KEY);
     console.log(ethers.BigNumber.from(BookId).toString())
