@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 pragma abicoder v2;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// currently deployed to 0x7b5c69876Acf21250737A15b9f65B9A6862984B7
+// currently deployed to 0x39f95AAc8FFE6C7ddF24ffa9292cD27e833A1dE9
 // https://goerli.etherscan.io/address/0x82E0f4BF61f139A9BaDCe64D0AcFbA32cB0B5E63#code
 contract Library is Ownable {
 
@@ -55,7 +55,7 @@ contract Library is Ownable {
     }
 
     function getListOfBooks() external view returns(Book[] memory) {
-        Book[] memory localBooks = new Book[](books.length);
+        Book[] memory localBooks = books;
         return localBooks;
     }
 
